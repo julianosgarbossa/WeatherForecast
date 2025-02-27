@@ -117,7 +117,7 @@ class HomeViewController: UIViewController {
         return label
     }()
     
-    private lazy var titleLabel: UILabel = {
+    private lazy var hourlyForecastLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = Typography.label
@@ -142,6 +142,30 @@ class HomeViewController: UIViewController {
         return collectionView
     }()
     
+    private lazy var dailyForecastLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = Typography.label
+        label.text = "PRÓXIMOS DIAS"
+        label.textColor = .white
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private lazy var dailyTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.backgroundColor = .clear
+        tableView.separatorColor = Colors.lightBlue
+        tableView.separatorInset = UIEdgeInsets.zero
+        tableView.layoutMargins = UIEdgeInsets.zero
+        tableView.showsVerticalScrollIndicator = false
+        tableView.dataSource = self
+        tableView.register(DailyTableViewCell.self, forCellReuseIdentifier: DailyTableViewCell.identifier)
+        tableView.delegate = self
+        return tableView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setVisualElements()
@@ -154,8 +178,10 @@ class HomeViewController: UIViewController {
         view.addSubview(tempLabel)
         view.addSubview(weatherImageView)
         view.addSubview(statsStackView)
-        view.addSubview(titleLabel)
+        view.addSubview(hourlyForecastLabel)
         view.addSubview(hourlyCollectionView)
+        view.addSubview(dailyForecastLabel)
+        view.addSubview(dailyTableView)
         
         statsStackView.addArrangedSubview(humidityStackView)
         statsStackView.addArrangedSubview(windStackView)
@@ -199,13 +225,21 @@ class HomeViewController: UIViewController {
             statsStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             statsStackView.widthAnchor.constraint(equalToConstant: 200),
             
-            titleLabel.topAnchor.constraint(equalTo: statsStackView.bottomAnchor, constant: 20),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            hourlyForecastLabel.topAnchor.constraint(equalTo: statsStackView.bottomAnchor, constant: 20),
+            hourlyForecastLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            hourlyCollectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            hourlyCollectionView.topAnchor.constraint(equalTo: hourlyForecastLabel.bottomAnchor, constant: 20),
             hourlyCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             hourlyCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             hourlyCollectionView.heightAnchor.constraint(equalToConstant: 85),
+            
+            dailyForecastLabel.topAnchor.constraint(equalTo: hourlyCollectionView.bottomAnchor, constant: 20),
+            dailyForecastLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            dailyTableView.topAnchor.constraint(equalTo: dailyForecastLabel.bottomAnchor, constant: 20),
+            dailyTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 35),
+            dailyTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -35),
+            dailyTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
     }
 }
@@ -229,5 +263,23 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
     
 }
 
+extension HomeViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 10
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: DailyTableViewCell.identifier, for: indexPath) as? DailyTableViewCell else { return UITableViewCell() }
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 50
+    }
+}
+
+extension HomeViewController: UITableViewDelegate {
+    
+}
 
 
