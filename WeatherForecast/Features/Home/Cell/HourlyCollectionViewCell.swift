@@ -49,6 +49,12 @@ class HourlyCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func setCell(time: String?, icon: UIImage?, temp: String?) {
+        self.hourLabel.text = time
+        self.weatherImageView.image = icon
+        self.tempLabel.text = temp
+    }
+    
     private func configLayoutCell() {
         self.contentView.backgroundColor = .clear
         self.contentView.layer.cornerRadius = 20

@@ -9,6 +9,10 @@ import UIKit
 
 class HomeViewController: UIViewController {
 
+    private let service = Service()
+    private var forecastResponse: ForecastResponse?
+    private let city = City(lat: "28.2612", lon: "-52.4083", name: "Chicago")
+    
     private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -169,6 +173,33 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setVisualElements()
+        self.fecthData()
+    }
+    
+    private func fecthData() {
+        self.service.fetchData(city: city) { [weak self] response in
+            self?.forecastResponse = response
+            DispatchQueue.main.async {
+                self?.loadData()
+            }
+        }
+    }
+    
+    private func loadData() {
+        cityLabel.text = city.name
+        let tempCelsius = self.kelvinToCelsius(forecastResponse?.current.temp ?? 0)
+        tempLabel.text = tempCelsius
+        humidityValueLabel.text = "\(forecastResponse?.current.humidity ?? 0)mm"
+        windValueLabel.text = "\(forecastResponse?.current.windSpeed ?? 0)km/h"
+        
+        self.hourlyCollectionView.reloadData()
+        self.dailyTableView.reloadData()
+    }
+    
+    // Converte temperatura de kelvin para celsius
+    func kelvinToCelsius(_ kelvin: Double) -> String {
+        let celsius = kelvin - 273.15
+        return String(format: "%.0fºC", celsius) // Arredonda para número inteiro
     }
     
     private func setVisualElements() {
@@ -246,11 +277,13 @@ class HomeViewController: UIViewController {
 
 extension HomeViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return self.forecastResponse?.hourly.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HourlyCollectionViewCell.identifier, for: indexPath) as? HourlyCollectionViewCell else { return UICollectionViewCell()}
+        let forecast = forecastResponse?.hourly[indexPath.row]
+        cell.setCell(time: forecast?.dt.toHourFormat(), icon: UIImage(named: "sunIcon"), temp: forecast?.temp.toCelsius())
         return cell
     }
 }
@@ -265,11 +298,13 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
 extension HomeViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return self.forecastResponse?.daily.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: DailyTableViewCell.identifier, for: indexPath) as? DailyTableViewCell else { return UITableViewCell() }
+        let forecast = forecastResponse?.daily[indexPath.row]
+        cell.setCell(weekDay: forecast?.dt.toWeekdayName().uppercased(), min: forecast?.temp.min.toCelsius(), max: forecast?.temp.max.toCelsius(), icon: UIImage(named: "rainIcon"))
         return cell
     }
     

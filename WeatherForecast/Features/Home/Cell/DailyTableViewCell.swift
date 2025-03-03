@@ -74,9 +74,17 @@ class DailyTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func setCell(weekDay: String?, min: String?, max: String?, icon: UIImage?) {
+        self.weakDayLabel.text = weekDay
+        self.weatherImageView.image = icon
+        self.minValueLabel.text = min
+        self.maxValueLabel.text = max
+    }
+    
     private func configLayoutCell() {
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
+        self.selectionStyle = .none
     }
     
     private func setVisualElements() {
