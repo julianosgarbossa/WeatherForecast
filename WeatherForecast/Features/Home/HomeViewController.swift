@@ -188,7 +188,7 @@ class HomeViewController: UIViewController {
     private func loadData() {
         cityLabel.text = city.name
         let tempCelsius = self.kelvinToCelsius(forecastResponse?.current.temp ?? 0)
-        tempLabel.text = tempCelsius
+        tempLabel.text = tempCelsius + "ºC"
         humidityValueLabel.text = "\(forecastResponse?.current.humidity ?? 0)mm"
         windValueLabel.text = "\(forecastResponse?.current.windSpeed ?? 0)km/h"
         
@@ -199,7 +199,7 @@ class HomeViewController: UIViewController {
     // Converte temperatura de kelvin para celsius
     func kelvinToCelsius(_ kelvin: Double) -> String {
         let celsius = kelvin - 273.15
-        return String(format: "%.0fºC", celsius) // Arredonda para número inteiro
+        return String(format: "%.0f", celsius) // Arredonda para número inteiro
     }
     
     private func setVisualElements() {
@@ -283,7 +283,8 @@ extension HomeViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HourlyCollectionViewCell.identifier, for: indexPath) as? HourlyCollectionViewCell else { return UICollectionViewCell()}
         let forecast = forecastResponse?.hourly[indexPath.row]
-        cell.setCell(time: forecast?.dt.toHourFormat(), icon: UIImage(named: "sunIcon"), temp: forecast?.temp.toCelsius())
+        let temp = self.kelvinToCelsius(forecast?.temp ?? 0)
+        cell.setCell(time: forecast?.dt.toHourFormat(), icon: UIImage(named: "sunIcon"), temp: temp + "ºC")
         return cell
     }
 }
@@ -304,7 +305,9 @@ extension HomeViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: DailyTableViewCell.identifier, for: indexPath) as? DailyTableViewCell else { return UITableViewCell() }
         let forecast = forecastResponse?.daily[indexPath.row]
-        cell.setCell(weekDay: forecast?.dt.toWeekdayName().uppercased(), min: forecast?.temp.min.toCelsius(), max: forecast?.temp.max.toCelsius(), icon: UIImage(named: "rainIcon"))
+        let min = self.kelvinToCelsius(forecast?.temp.min ?? 0)
+        let max = self.kelvinToCelsius(forecast?.temp.max ?? 0)
+        cell.setCell(weekDay: forecast?.dt.toWeekdayName().uppercased(), min: min, max: max, icon: UIImage(named: "rainIcon"))
         return cell
     }
     
