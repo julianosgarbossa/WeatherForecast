@@ -27,7 +27,7 @@ Desenvolvido em **Swift**, o projeto utiliza **UIKit com View Code**, **Auto Lay
 ## 🖼️ Demonstração
 
 <p align="center">
-  <img src="./assets/01_Home.png" alt="Tela de previsão do tempo com temperatura, umidade, vento e previsões por hora e por dia" width="300" />
+  <img src="./assets/01_Home.png" alt="Tela de previsão do tempo com temperatura, umidade, vento e previsões por hora e por dia" width="18%" />
 </p>
 
 ## ✨ Funcionalidades
